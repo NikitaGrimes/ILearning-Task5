@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Этот файл используется процессом публикации или упаковки вашего веб-проекта. Можно настроить поведение этого процесса,
+изменив этот файл MSBuild. Подробности см. на странице https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAI1Px4XA+GkqiFSgojEXTXwAAAAACAAAAAAAQZgAAAAEAACAAAADJMENL+FSvL5EIlXksVOX1yKxFNr5ubzZuITom2fY2nwAAAAAOgAAAAAIAACAAAACNoUuYCoLcjORqfBR/RQ6nYTxIgY3nKVqVe6UzVSXbWiAAAAC/vUuvrGnURhPN+bVvJ0fSo8NdqiJbhQlp80zNI7aomkAAAADvwkGv60sI6dgFUQvHs/E2Dgwqu0lauMoX7TABEm/7gwe4aiSdK4+rEN0XoSc9azI6GjJa5kd/qwMBofzRO0JW</EncryptedPassword>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="ConnectionString">
+      <Value>Data Source=SQL8002.site4now.net%3bInitial Catalog=db_a93717_users%3bUser Id=db_a93717_users_admin%3bPassword=P%40ssw0rd!</Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="ConnetctionString">
+      <Value>Data Source=SQL8002.site4now.net%3bInitial Catalog=db_a93717_users%3bUser Id=db_a93717_users_admin%3bPassword=P%40ssw0rd!</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="Task5.Data.ApplicationContext">
+      <Value>Data Source=SQL8002.site4now.net%3bInitial Catalog=db_a93717_users%3bUser Id=db_a93717_users_admin%3bPassword=P%40ssw0rd!</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>

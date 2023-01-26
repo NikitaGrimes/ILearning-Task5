@@ -1,0 +1,28 @@
+﻿@model List<UserModel>
+<table class="table">
+    @for (int i = 0; i < Model.Count(); i++)
+    {
+        <tr>
+            <td>
+                <label asp-for="@Model[i].NumberInList" id="fakeNumberInList{@i}">@Model[i].NumberInList</label>
+                <input asp-for="@Model[i].NumberInList" id="numberInList{@i}" type="hidden" />
+            </td>
+            <td>
+                <label asp-for="@Model[i].FullName" id="fakefullName{@Model[i].NumberInList}">@Model[i].FullName</label>
+                <input asp-for="@Model[i].FullName" id="fullName{@Model[i].NumberInList}" type="hidden" />
+            </td>
+            <td>
+                <label asp-for="@Model[i].Id" id="fakeid{@Model[i].NumberInList}">@Model[i].Id</label>
+                <input asp-for="@Model[i].Id" id="id{@Model[i].NumberInList}" type="hidden" />
+            </td>
+            <td>
+                <label asp-for="@Model[i].PhoneNumber" id="fakephoneNumber{@Model[i].NumberInList}">@Model[i].PhoneNumber</label>
+                <input asp-for="@Model[i].PhoneNumber" id="phoneNumber{@Model[i].NumberInList}" type="hidden" />
+            </td>
+            <td>
+                <label asp-for="@Model[i].Adress" id="fakeadress{@Model[i].NumberInList}">@Model[i].Adress</label>
+                <input asp-for="@Model[i].Adress" id="adress{@Model[i].NumberInList}" type="hidden" />
+            </td>
+        </tr>
+    }
+</table>

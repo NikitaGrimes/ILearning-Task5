@@ -1,0 +1,256 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <div class="form-group">
+            <label>Number of Errors</label>
+            <input class="form-control" id="numOfErrors" value="0" />
+            <label>Seed</label>
+            <input class="form-control" id="seed" value="0"/>
+            <hr/>
+            <input onclick="setRandomSeedFunc()" type="submit" value="Set random seed" class="btn btn-success" id="setRandomSeed" />
+            <hr />
+            <div class="dropstart">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                    Locale
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a onclick="selectLocale('USA')" id="localeUSA" class="dropdown-item active" href="#" aria-current="true">USA</a></li>
+                    <li><a onclick="selectLocale('Ger')" id="localeGer" class="dropdown-item" href="#">Deutschland</a></li>
+                    <li><a onclick="selectLocale('Itl')" id="localeItl" class="dropdown-item" href="#">Italia</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <td>
+            <label class="text-center col-xs-12 col-md-8">#</label>
+        </td>
+        <td>
+            <label class="text-center col-xs-3 col-md-3">Full Name</label>
+        </td>
+        <td>
+            <label class="text-center col-xs-12 col-md-8">Id</label>
+        </td>
+        <td>
+            <label class="text-center col-md-3 offset-md-3">Phone Number</label>
+        </td>
+        <td>
+            <label class="text-center col-xs-6 col-md-4">Adress</label>
+        </td>
+    </tr>
+</table>
+<div id="scrolList">
+    @Html.Partial("_Items")
+</div>
+
+<script>
+    const itemInPage = 20;
+    var page = 0;
+    var _inCallback = false;
+    var errorValue = 0;
+    var seedValue = 0;
+    var locale = "USA";
+
+    const input = document.getElementById('numOfErrors');
+    input.addEventListener('input', updateValueError);
+
+    const seeder = document.getElementById('seed');
+    seeder.addEventListener('input', updateValueSeed);
+
+    const usaLocale = document.getElementById('localeUSA');
+    const gerLocale = document.getElementById('localeGer');
+    const itlLocale = document.getElementById('localeItl');
+
+    function updateValueError(e) {
+        errorValue = parseFloat(e.target.value);
+        if (!isNaN(errorValue)) {
+            if (errorValue > 1000){
+                errorValue = 1000;
+                input.value = 1000;
+            }
+            createErrorsWithSeed(errorValue, seeder.value);
+        }
+        else{
+            errorValue = 0;
+        }
+    }
+
+    function createErrorsWithSeed(_errorValue, _seedValue) {
+        for (var i = 0; i < (itemInPage * (page + 1)); i++) {
+            generateErrorForElement('fullName', _errorValue, _seedValue, i);
+            generateErrorForElement('id', _errorValue, _seedValue + 1, i);
+            generateErrorForElement('phoneNumber', _errorValue, _seedValue + 2, i);
+            generateErrorForElement('adress', _errorValue, _seedValue + 3, i);
+        }
+    }
+
+    function generateErrorForElement(element, _errorValue, _seedValue, i) {
+        _seedValue = parseInt(_seedValue);
+        var errorValueInt = parseInt(_errorValue);
+        var errorValueFloat = parseFloat(parseFloat(_errorValue) - errorValueInt);
+        const trueName = document.getElementById(element + '{' + i + '}');
+        const fakeName = document.getElementById('fake' + element + '{' + i + '}');
+        var newName = trueName.value;
+        for (var err = 0; err < errorValueInt; err++) {
+            newName = generateRandomError(newName, _seedValue + (i * 10 + 1) * (err + 1) + errorValueInt);
+        }
+        var randNumber = mulberry32(_seedValue + i * itemInPage);
+        if (randNumber < errorValueFloat) {
+            newName = generateRandomError(newName, _seedValue);
+        }
+        fakeName.textContent = newName;
+    }
+
+    function generateRandomError(str, _seedValue){
+        var temp = mulberry32(_seedValue);
+        if(temp < 1/3){
+            return deleteChar(str, _seedValue);
+        }
+        else if (temp < 2/3){
+            return addChar(str, _seedValue);
+        }
+        else {
+            return replaceChar(str, _seedValue);
+        }
+    }
+
+    function deleteChar(str, _seedValue){
+        const deleteFuncSeed = 30;
+        let numOfCharForDelete = parseInt(mulberry32(parseInt(_seedValue) + deleteFuncSeed) * str.length);
+        var newStr = str.substring(0, numOfCharForDelete) + str.substring(numOfCharForDelete + 1, str.length)
+        return newStr;
+    }
+
+    function addChar(str, _seedValue) {
+        const addFuncSeed = 60;
+        var words = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+        let numOfCharForAdd = parseInt(mulberry32(parseInt(_seedValue) + addFuncSeed) * str.length);
+        let charForAdd = words[parseInt(mulberry32(parseInt(_seedValue) * addFuncSeed) * words.length)];
+        return str.substring(0, numOfCharForAdd + 1) + charForAdd + str.substring(numOfCharForAdd + 1, str.length);
+    }
+
+    function replaceChar(str, _seedValue){
+        if (str.length >= 2){
+            const replaceFuncSeed = 90;
+            let numOfCharForReplace = parseInt(mulberry32(_seedValue + replaceFuncSeed) * (str.length - 1));
+            var newStr = str.substring(0, numOfCharForReplace) + str.substring(numOfCharForReplace + 1, numOfCharForReplace + 2) + str.substring(numOfCharForReplace, numOfCharForReplace + 1) + str.substring(numOfCharForReplace + 2, str.length);
+            return newStr;
+        }
+        else return str;
+    }
+
+    function updateValueSeed(e) {
+        $("#scrolList").html('')
+        page = 0
+        seedValue = parseInt(seeder.value);
+        if (!isNaN(seedValue)){
+            $.ajax({
+                type: 'GET',
+                url: '/Home/Index/' + page + "/" + seedValue + "/" + locale,
+                success: function (data, textstatus) {
+                    if (data != '') {
+                        $("#scrolList").append(data);
+                    }
+                    else {
+                        page = -1;
+                    }
+                    _inCallback = false;
+                    createErrorsWithSeed(errorValue, seedValue);
+                }
+            });
+        }
+        else {
+            seedValue = 0;
+        }
+    }
+
+    function selectLocale(_locale){
+        if (locale.includes(_locale)){
+            return;
+        }
+        locale = _locale;
+        usaLocale.setAttribute("class", "dropdown-item");
+        usaLocale.setAttribute("aria-current", "false");
+        gerLocale.setAttribute("class", "dropdown-item");
+        gerLocale.setAttribute("aria-current", "false");
+        itlLocale.setAttribute("class", "dropdown-item");
+        itlLocale.setAttribute("aria-current", "false");
+        if (locale.includes('Ger')){
+            gerLocale.setAttribute("class", "dropdown-item active");
+            gerLocale.setAttribute("aria-current", "true");
+        }
+        else if (locale.includes('Itl')){
+            itlLocale.setAttribute("class", "dropdown-item active");
+            itlLocale.setAttribute("aria-current", "true");
+        }
+        else {
+            usaLocale.setAttribute("class", "dropdown-item active");
+            usaLocale.setAttribute("aria-current", "true");
+        }
+        updateValueSeed(null);
+    }
+
+    function setRandomSeedFunc(){
+        let temp = parseInt(Math.random() * 10000000);
+        seeder.value = temp;
+        seedValue = temp;
+        $("#scrolList").html('')
+        page = 0
+        $.ajax({
+            type: 'GET',
+            url: '/Home/Index/' + page + "/" + temp + "/" + locale,
+            success: function (data, textstatus) {
+                if (data != '') {
+                    $("#scrolList").append(data);
+                }
+                else {
+                    page = -1;
+                }
+                _inCallback = false;
+                createErrorsWithSeed(errorValue, seedValue);
+            }
+        });
+    }
+
+    function loadItems() {
+        if (page > -1 && !_inCallback) {
+            _inCallback = true;
+            page++;
+            let seed = seeder.value;
+            $.ajax({
+                type: 'GET',
+                url: '/Home/Index/' + page + "/" + seed + "/" + locale,
+                success: function (data, textstatus) {
+                    if (data != '') {
+                        $("#scrolList").append(data);
+                    }
+                    else {
+                        page = -1;
+                    }
+                    _inCallback = false;
+                    createErrorsWithSeed(errorValue, seedValue);
+                }
+            });
+        }
+    }
+
+    function mulberry32(a) {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+
+    document.addEventListener('scroll', () => 
+    {
+        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
+            loadItems();
+        }
+    });
+</script>
